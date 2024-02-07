@@ -1,5 +1,8 @@
 use crate::expr::Expr;
 use crate::utils;
+use crate::env::Env;
+use crate::val::Val;
+
 #[derive(Debug, PartialEq)]
 pub struct BindingDef {
     name: String,
@@ -8,11 +11,7 @@ pub struct BindingDef {
 
 impl BindingDef {
     pub fn new(s: &str) -> (&str, Self) {
-        let s = if s.starts_with("make") {
-            &s[4..]
-        } else {
-            panic!("expected make")
-        };
+        let s = utils::tag("make", s);
         let (s, _) = utils::extract_whitespace(s);
 
         let (s, name) = utils::extract_ident(s);
@@ -58,20 +57,6 @@ mod tests {
             ),
         );
     }
-    // fn parse_binding_def() {
-    //     assert_eq!( 
-    //         BindingDef::new("make a = b"),
-    //         (
-    //             "",
-    //             BindingDef {
-    //                 name: "a".to_string(),
-    //                 val: Expr {
-    //                     lhs: Number(10),
-    //                     rhs: Number(2),
-    //                     op: Op::Div,
-    //                 },
-    //             },
-    //         ),
-    //     );
-    // }
+    
+
 }

@@ -1,8 +1,9 @@
 use crate::utils;
+use crate::val::Val;
+
 #[derive(Debug, PartialEq)]
 pub struct Number(pub i32);
-#[derive(Debug, PartialEq)]
-pub struct Evaluate(pub i32);
+
 
 #[derive(Debug, PartialEq)]
 pub enum Op {
@@ -11,8 +12,6 @@ pub enum Op {
     Mul,
     Div,
 }
-
-
 
 #[derive(Debug, PartialEq)]
 pub struct Expr {
@@ -54,81 +53,125 @@ impl Expr {
         (s, Self { lhs, rhs, op })
         
     }
-}
+    pub(crate) fn eval(&self) -> Val {
+        let Number(lhs) = self.lhs;
+        let Number(rhs) = self.rhs;
 
-impl Evaluate{
-    pub fn new(s: &str) -> (&str, Self) {
-        let (s, lhs) = Number::new(s);
-         let (s, _) = utils::extract_whitespace(s);
-        let (s, op) = Op::new(s);
-        let (s, _) = utils::extract_whitespace(s);
-        let (s, rhs) = Number::new(s);
-        
-        let result = match op {
-            Op::Add => lhs.0 + rhs.0,
-            Op::Sub => lhs.0 - rhs.0,
-            Op::Mul => lhs.0 * rhs.0,
-            Op::Div => lhs.0 / rhs.0,
+        let result = match self.op {
+            Op::Add => lhs + rhs,
+            Op::Sub => lhs - rhs,
+            Op::Mul => lhs * rhs,
+            Op::Div => lhs / rhs,
         };
-        (s, Self(result))
+
+        Val::Number(result)
     }
 }
-//#[cfg(test)]
-// mod tests {
-//     use super::*;
-//     fn parse_number() {
-//         assert_eq!(Number::new("123"), ("", Number(123)));
-//     }
 
-//     #[test]
-//     fn parse_add_op() {
-//         assert_eq!(Op::new("+"), ("", Op::Add));
-//     }
+#[cfg(test)]
+mod tests {
+    use super::*;
+     #[test]
+    fn parse_number() {
+        assert_eq!(Number::new("123"), ("", Number(123)));
+    }
 
-//     #[test]
-//     fn parse_sub_op() {
-//         assert_eq!(Op::new("-"), ("", Op::Sub));
-//     }
+    #[test]
+    fn parse_add_op() {
+        assert_eq!(Op::new("+"), ("", Op::Add));
+    }
 
-//     #[test]
-//     fn parse_mul_op() {
-//         assert_eq!(Op::new("*"), ("", Op::Mul));
-//     }
+    #[test]
+    fn parse_sub_op() {
+        assert_eq!(Op::new("-"), ("", Op::Sub));
+    }
 
-//     #[test]
-//     fn parse_div_op() {
-//         assert_eq!(Op::new("/"), ("", Op::Div));
-//     }
-//     #[test]
-//     fn parse_one_plus_two() {
-//         assert_eq!(
-//             Expr::new("1+2"),
-//             (
-//                 "",
-//                 Expr {
-//                     lhs: Number(1),
-//                     rhs: Number(2),
-//                     op: Op::Add,
-//                 },
-//             ),
-//         );
-//     }
-//     #[test]
-//     fn parse_expr_with_whitespace() {
-//         assert_eq!(
-//             Expr::new("2 * 2"),
-//             (
-//                 "",
-//                 Expr {
-//                     lhs: Number(2),
-//                     rhs: Number(2),
-//                     op: Op::Mul,
-//                 },
-//             ),
-//         );
-//     }
-//     #[test]
-//     fn parse_operation(){
-//         assert_eq!(Evaluate::new("1+2"), ("", Evaluate(3)));
-//     }
-// }
+    #[test]
+    fn parse_mul_op() {
+        assert_eq!(Op::new("*"), ("", Op::Mul));
+    }
+
+    #[test]
+    fn parse_div_op() {
+        assert_eq!(Op::new("/"), ("", Op::Div));
+    }
+    #[test]
+    fn parse_one_plus_two() {
+        assert_eq!(
+            Expr::new("1+2"),
+            (
+                "",
+                Expr {
+                    lhs: Number(1),
+                    rhs: Number(2),
+                    op: Op::Add,
+                },
+            ),
+        );
+    }
+    #[test]
+    fn parse_expr_with_whitespace() {
+        assert_eq!(
+            Expr::new("2 * 2"),
+            (
+                "",
+                Expr {
+                    lhs: Number(2),
+                    rhs: Number(2),
+                    op: Op::Mul,
+                },
+            ),
+        );
+    }
+    #[test]
+    fn eval_add() {
+        assert_eq!(
+            Expr {
+                lhs: Number(10),
+                rhs: Number(10),
+                op: Op::Add,
+            }
+            .eval(),
+            Val::Number(20),
+        );
+    }
+
+    #[test]
+    fn eval_sub() {
+        assert_eq!(
+            Expr {
+                lhs: Number(1),
+                rhs: Number(5),
+                op: Op::Sub,
+            }
+            .eval(),
+            Val::Number(-4),
+        );
+    }
+
+    #[test]
+    fn eval_mul() {
+        assert_eq!(
+            Expr {
+                lhs: Number(5),
+                rhs: Number(6),
+                op: Op::Mul,
+            }
+            .eval(),
+            Val::Number(30),
+        );
+    }
+
+    #[test]
+    fn eval_div() {
+        assert_eq!(
+            Expr {
+                lhs: Number(200),
+                rhs: Number(20),
+                op: Op::Div,
+            }
+            .eval(),
+            Val::Number(10),
+        );
+    }
+}
