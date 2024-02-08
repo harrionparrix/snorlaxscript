@@ -42,19 +42,19 @@ mod tests {
 
     #[test]
     fn parse_binding_def() {
-        assert_eq!( 
-            BindingDef::new("make a = 10 /2"),
-            (
+        assert_eq!(
+            BindingDef::new("let a = 10 / 2"),
+            Ok((
                 "",
                 BindingDef {
                     name: "a".to_string(),
-                    val: Expr {
+                    val: Expr::Operation {
                         lhs: Number(10),
                         rhs: Number(2),
                         op: Op::Div,
                     },
                 },
-            ),
+            )),
         );
     }
     
